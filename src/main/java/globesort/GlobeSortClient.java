@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Timer;
+import java.util.Date;
 
 public class GlobeSortClient {
 
@@ -40,13 +42,41 @@ public class GlobeSortClient {
 
     public void run(Integer[] values) throws Exception {
         System.out.println("Pinging " + serverStr + "...");
-        serverStub.ping(Empty.newBuilder().build());
-        System.out.println("Ping successful.");
 
-        System.out.println("Requesting server to sort array");
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = 0L;
+        serverStub.ping(Empty.newBuilder().build());
+        elapsedTime = (new Date()).getTime() - startTime;
+        System.out.print("Ping successful. The latency in millisecond is ");
+        System.out.println(elapsedTime);
+
+        System.out.println("Pinging " + serverStr + "...");
+
+        startTime = System.currentTimeMillis();
+        elapsedTime = 0L;
+        serverStub.ping(Empty.newBuilder().build());
+        elapsedTime = (new Date()).getTime() - startTime;
+        System.out.print("Ping successful. The latency in millisecond is ");
+        System.out.println(elapsedTime);
+
+
+        System.out.println("Requesting server to sort array...");
+
+        startTime = System.currentTimeMillis();
         IntArray request = IntArray.newBuilder().addAllValues(Arrays.asList(values)).build();
+
+        
         IntArray response = serverStub.sortIntegers(request);
-        System.out.println("Sorted array");
+        elapsedTime = (new Date()).getTime() - startTime;
+        System.out.print("Response is ready. The wait time in millisecond is ");
+        System.out.println(elapsedTime);
+
+        // Integer[] output = response.getValuesList().toArray(new Integer[response.getValuesList().size()]);
+        // System.out.println("Sorted array: ");
+        // for(Integer i : output) {
+        //     System.out.print(i.toString() + ' ');
+        // }
+        // System.out.println("");
     }
 
     public void shutdown() throws InterruptedException {
@@ -83,18 +113,26 @@ public class GlobeSortClient {
     }
 
     public static void main(String[] args) throws Exception {
+        
+        Date cur_date = new Date();
+        System.out.println(cur_date.toString());
+        
         Namespace cmd_args = parseArgs(args);
         if (cmd_args == null) {
             throw new RuntimeException("Argument parsing failed");
         }
 
         Integer[] values = genValues(cmd_args.getInt("num_values"));
-
+        long startTime = System.currentTimeMillis();
+        long elapsedTime = 0L;
         GlobeSortClient client = new GlobeSortClient(cmd_args.getString("server_ip"), cmd_args.getInt("server_port"));
         try {
             client.run(values);
         } finally {
             client.shutdown();
         }
+        elapsedTime = (new Date()).getTime() - startTime;
+        System.out.print("overall main() function consumes time in millisecond: ");
+        System.out.println(elapsedTime);
     }
 }
