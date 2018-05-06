@@ -40,7 +40,7 @@ public class GlobeSortClient {
         this.serverStr = ip + ":" + port;
     }
 
-    public void run(Integer[] values) throws Exception {
+    public void run(Integer[] values, int num_values) throws Exception {
         System.out.println("Pinging " + serverStr + "...");
 
         long startTime = System.currentTimeMillis();
@@ -57,7 +57,7 @@ public class GlobeSortClient {
         serverStub.ping(Empty.newBuilder().build());
         elapsedTime = (new Date()).getTime() - startTime;
         System.out.print("Ping successful. The latency in millisecond is ");
-        System.out.println(elapsedTime);
+        System.out.println(elapsedTime/2);
 
 
         System.out.println("Requesting server to sort array...");
@@ -70,13 +70,14 @@ public class GlobeSortClient {
         elapsedTime = (new Date()).getTime() - startTime;
         System.out.print("Response is ready. The wait time in millisecond is ");
         System.out.println(elapsedTime);
-
-        // Integer[] output = response.getValuesList().toArray(new Integer[response.getValuesList().size()]);
-        // System.out.println("Sorted array: ");
-        // for(Integer i : output) {
-        //     System.out.print(i.toString() + ' ');
-        // }
-        // System.out.println("");
+        double app_throughput = (double)num_values/elapsedTime*1000;
+        System.out.print("Application level throughput: ");
+        System.out.println(app_throughput);
+        Integer[] output = response.getValuesList().toArray(new Integer[response.getValuesList().size()]);
+        int processing_time = output[output.length - 1];
+        double network_throughput = (double)num_values/(elapsedTime - processing_time)*2*1000;
+        System.out.print("Network level throughput: ");
+        System.out.println(network_throughput);
     }
 
     public void shutdown() throws InterruptedException {
@@ -122,12 +123,13 @@ public class GlobeSortClient {
             throw new RuntimeException("Argument parsing failed");
         }
 
+        int num_values = cmd_args.getInt("num_values");
         Integer[] values = genValues(cmd_args.getInt("num_values"));
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0L;
         GlobeSortClient client = new GlobeSortClient(cmd_args.getString("server_ip"), cmd_args.getInt("server_port"));
         try {
-            client.run(values);
+            client.run(values, num_values);
         } finally {
             client.shutdown();
         }

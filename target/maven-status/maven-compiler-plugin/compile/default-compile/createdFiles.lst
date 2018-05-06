@@ -1,4 +1,3 @@
-globesort/GlobeSortGrpc$GlobeSortBlockingStub.class
 globesort/EmptyOrBuilder.class
 globesort/Empty.class
 globesort/GlobeSortServer$GlobeSortImpl.class
@@ -7,7 +6,6 @@ globesort/IntArray$1.class
 globesort/Empty$1.class
 globesort/GlobeSortServer$1.class
 globesort/IntArray.class
-globesort/GlobeSortGrpc$MethodHandlers.class
 globesort/GlobeSortServer.class
 globesort/Empty$Builder.class
 globesort/GlobeSortGrpc.class

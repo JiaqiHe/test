@@ -98,12 +98,14 @@ public class GlobeSortServer {
             for(Integer val : values) {
                 responseBuilder.addValues(val);
             }
-            IntArray response = responseBuilder.build();
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
             elapsedTime = (new Date()).getTime() - startTime;
             System.out.println("sorting time: ");
             System.out.println(elapsedTime);
+            responseBuilder.addValues((int)elapsedTime);
+            IntArray response = responseBuilder.build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+            
         }
     }
 }
